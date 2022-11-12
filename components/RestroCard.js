@@ -30,7 +30,9 @@ const RestroCard = ({
 
         <View className="flex-row items-center space-x-1">
           <MapPinIcon color="gray" opacity={0.4} size={22} />
-          <Text className="text-xs text-gray-500">Nearby | {address}</Text>
+          <Text className="text-xs text-gray-500">
+            Nearby | {address.slice(0, 20)}...
+          </Text>
         </View>
       </View>
     </TouchableOpacity>

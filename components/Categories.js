@@ -1,9 +1,22 @@
 import { View, Text, ScrollView } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CategoryCard from "./CategoryCard";
-import FeaturedRow from "./FeaturedRow";
 
 const Categories = () => {
+  const [categories, setCategories] = useState([]);
+
+  const getInitialData = async () => {
+    const response = await fetch(
+      "https://abdsqnsk.api.sanity.io/v2021-10-21/data/query/production?query=*%5B_type%20%3D%3D%20'category'%5D%20%7B%0A%20%20...%2C%0A%20%20%22imageUrl%22%3A%20image.asset-%3Eurl%2C%0A%7D"
+    );
+    const data = await response.json();
+    setCategories(data.result);
+  };
+
+  useEffect(() => {
+    getInitialData();
+  }, []);
+
   return (
     <View>
       <ScrollView
@@ -12,56 +25,16 @@ const Categories = () => {
         showsHorizontalScrollIndicator={false}
       >
         {/* Category Card */}
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 1"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 2"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 3"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 3"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 3"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 3"
-        />
-        <CategoryCard
-          imgUrl="https://res.cloudinary.com/dn6vz8exv/image/upload/v1667887658/deliverrry/sushi-place_a8nhul.jpg"
-          title="Testing 3"
-        />
+        {categories?.map((category) => {
+          return (
+            <CategoryCard
+              key={category._id}
+              imgUrl={category.imageUrl}
+              title={category.name}
+            />
+          );
+        })}
       </ScrollView>
-
-      {/* Featured Rows */}
-      <FeaturedRow
-        id="1"
-        title="Featured"
-        description="Paid placements from our partners"
-      />
-
-      {/* Tasty Discounts */}
-      <FeaturedRow
-        id="2"
-        title="Tasty Discounts"
-        description="Everyone's been enjoying these juicy discounts"
-      />
-
-      {/* Offers Near You */}
-      <FeaturedRow
-        id="3"
-        title="Offers Near You"
-        description="Why not explore a restaurant near you?"
-      />
     </View>
   );
 };

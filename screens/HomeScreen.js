@@ -1,5 +1,5 @@
 import { View, Text, Image, TextInput, ScrollView } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useEffect, useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -9,14 +9,28 @@ import {
   AdjustmentsVerticalIcon,
 } from "react-native-heroicons/outline";
 import Categories from "../components/Categories";
+import FeaturedRow from "../components/FeaturedRow";
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const [featuredCategories, setFeaturedCategories] = useState([]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
+  }, []);
+
+  const fetchInitialData = async () => {
+    const response = await fetch(
+      "https://abdsqnsk.api.sanity.io/v2021-10-21/data/query/production?query=*%5B_type%20%3D%3D%20'featured'%5D%20%7B%0A%20%20...%2C%0A%20%20restaurants%5B%5D%20-%3E%20%7B%0A%20%20%20%20...%2C%0A%20%20%20%20dishes%5B%5D%20-%3E%0A%20%20%7D%0A%7D"
+    );
+    const data = await response.json();
+    setFeaturedCategories(data.result);
+  };
+
+  useEffect(() => {
+    fetchInitialData();
   }, []);
 
   return (
@@ -56,9 +70,19 @@ const HomeScreen = () => {
       {/* Body */}
       <ScrollView className="bg-gray-100 flex-1">
         {/* Categories */}
-        <Categories></Categories>
+        <Categories />
 
         {/* Featured Rows */}
+        {featuredCategories?.map((category) => {
+          return (
+            <FeaturedRow
+              key={category._id}
+              id={category._id}
+              title={category.name}
+              description={category.short_description}
+            />
+          );
+        })}
       </ScrollView>
     </SafeAreaView>
   );
